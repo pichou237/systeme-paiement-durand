@@ -1,0 +1,5 @@
+Django
+django-debug-toolbar
+djangorestframework
+djangorestframework_simplejwt
+django-cors-headers
