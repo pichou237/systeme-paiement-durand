@@ -1,20 +1,21 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from .manager import UserManager
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.utils import timezone
-from datetime import timedelta
 
-class User(models.Model):
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    phone_number= models.CharField(max_length=15, blank=True)
+from django.utils import timezone
+from datetime import datetime, timedelta
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    
+    email = models.EmailField(verbose_name=_('email address'), max_length=255, unique=True)
+    first_name = models.CharField(max_length=255, verbose_name=_("first name"))
+    last_name = models.CharField(max_length=255, verbose_name=_("last name"), null=True, blank=False)
+    phone_number = models.CharField(max_length=20, verbose_name=_("phone number"), null=False, blank=True)  
+    city = models.CharField(max_length=255, verbose_name=_("city"), null=True, blank=True)
+    address = models.TextField(verbose_name=_("address"), null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -41,4 +42,13 @@ class User(models.Model):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+def default_expiry():
+        return datetime.now() + timedelta(minutes=10)
 
+class OneTimePasscode(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    expires_at = models.DateTimeField(default=default_expiry)
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
