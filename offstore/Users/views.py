@@ -8,7 +8,7 @@ from .utils import send_code_to_user
 from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from .permissions import IsStaff, IsUser
+from .permissions import  IsStaff, IsUser
 from django.contrib.auth import logout
 from rest_framework.views import APIView
 from django.core.cache import cache
@@ -27,7 +27,7 @@ class UserRegisterView(GenericAPIView, mixins.UpdateModelMixin):
 
             return Response({
                 'data' : user,
-                'message' : _(f'User {user["first_name"]} created successfully, and code has be sent to your email'),
+                'message' : _(f'User {user['first_name']} created successfully, and code has be sent to your email'),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -60,4 +60,3 @@ class LoginUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data, context={'request':request})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    

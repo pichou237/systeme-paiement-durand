@@ -1,6 +1,6 @@
 from .models import User, OneTimePasscode
 from rest_framework import serializers
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_bytes, force_str
@@ -18,7 +18,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name','phone_number', 'password', 'password_confirm']
+        fields = ['email', 'first_name', 'last_name', 'password', 'password_confirm']
 
     def validate(self, attrs):
         password = attrs.get('password', '')
@@ -31,7 +31,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(
             email=validated_data['email'],
-            phone_number=validated_data['phone_number'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             password=validated_data['password']
