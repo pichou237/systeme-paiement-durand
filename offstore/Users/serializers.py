@@ -60,31 +60,35 @@ class UserLoginSerializer(serializers.ModelSerializer):
         email = attrs.get('email')
         password = attrs.get('password')
         request = self.context.get('request')
-        print(f"{email} - {password}")
+
+        # Authentification de l'utilisateur
         user = authenticate(request, email=email, password=password)
-        print(request)
-        print(user)
+
+        if not user:
+            raise AuthenticationFailed("Invalid credentials, please try again.")
+
+        if not user.is_verified:
+            raise AuthenticationFailed("Email is not verified. Please verify your email.")
 
         try:
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-        except:
-            uidb64 = None
-            
-        if not user:
-            raise AuthenticationFailed("invalid credentials, try again")
-        
-        if not user.is_verified:
-            raise AuthenticationFailed("Email is not verified")
+        except Exception:
+            raise AuthenticationFailed("An error occurred while processing your request.")
 
-        user_tokens = user.tokens()
+        try:
+            user_tokens = user.tokens()
+        except Exception:
+            raise AuthenticationFailed("Unable to generate tokens. Please contact support.")
+
+        # Connexion de l'utilisateur
         login(request, user)
 
         return {
-            'email' : user.email, 
-            'full_name' : user.get_full_name,
-            'uidb64' : uidb64,
-            'access_token' : str(user_tokens.get('access')),
-            'refresh_token' : str(user_tokens.get('refresh')),
+            'email': user.email,
+            'full_name': user.get_full_name(),
+            'uidb64': uidb64,
+            'access_token': str(user_tokens.get('access')),
+            'refresh_token': str(user_tokens.get('refresh')),
         }
     
 class PasswordResetRequestSerializer(serializers.ModelSerializer):
