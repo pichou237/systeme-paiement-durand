@@ -5,7 +5,7 @@ from django.conf import settings
 
 def generateOtp(): # or we can use the library pyotp
     otp = ""
-    for i in range(5):
+    for i in range(6):
         otp += str(random.randint(1,9))
     return otp
 

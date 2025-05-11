@@ -1,5 +1,5 @@
 from .models import User, OneTimePasscode
-from .serializers import UserRegisterSerializer, VerifyEmailSerializer, UserLoginSerializer
+from .serializers import LogoutUserSerializer, UserRegisterSerializer, VerifyEmailSerializer, UserLoginSerializer, SetNewPasswordSerializer, PasswordResetRequestSerializer
 from rest_framework.generics import GenericAPIView
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.response import Response
@@ -12,6 +12,8 @@ from .permissions import  IsStaff, IsUser
 from django.contrib.auth import logout
 from rest_framework.views import APIView
 from django.core.cache import cache
+from rest_framework.exceptions import ValidationError
+
 
 class UserRegisterView(GenericAPIView, mixins.UpdateModelMixin):
     serializer_class = UserRegisterSerializer
@@ -53,10 +55,95 @@ class VerifyEmailView(GenericAPIView):
                 'message':'passcode not provided'
             }, status=status.HTTP_404_NOT_FOUND)
         
+
 class LoginUserView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     def post(self, request):
+        try:
+            serializer = self.serializer_class(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            return Response({
+                'message': 'Login successful',
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({
+                'message': 'Invalid login credentials',
+                'errors': e.detail
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'message': 'An unexpected error occurred',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class PasswordResetRequestView(GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+
+    def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request':request})
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({
+            'message':'a link has been send to your email to reset your password'
+        }, status=status.HTTP_200_OK)
+    
+class PasswordResetConfirm(GenericAPIView):
+    def get(self, request, uidb64, token):
+        try:
+            user_id = smart_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=user_id)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                return Response({
+                    'message': _('token is invalid or has expired')
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                'success': True,
+                'message':'credential is valid',
+                'uidb64': uidb64,
+                'token':token,
+            },status=status.HTTP_200_OK)
+        
+        except DjangoUnicodeDecodeError:
+            return Response({
+                'message':'token is invalid or has expired'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+class SetNewPasswordView(GenericAPIView):
+    serializer_class = SetNewPasswordSerializer
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print(serializer.data)
+        return Response({
+            'message':'password reset successfully'
+        }, status=status.HTTP_200_OK)
+
+class UpdateProfileView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [IsUser, IsStaff]
+
+class LogoutUserView(GenericAPIView):
+    serializer_class = LogoutUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    """Session authentication"""
+    def get(self, request):
+        logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    """Json Web Token authentication"""
+
+class RefreshTokenView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        tokens = user.tokens()
+        cache.set("token", tokens)
+        return Response(tokens)
+ 
