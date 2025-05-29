@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ProduitsConfig(AppConfig):
+class ManagePayConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'produits'
+    name = 'manage_pay'
