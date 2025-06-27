@@ -4,3 +4,4 @@ djangorestframework
 djangorestframework_simplejwt
 django-cors-headers
 stripe
+python-decouple
