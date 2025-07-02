@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-4r-zsa!v(=2=j5wl0o!l2dvg)5^n=9#9a58w46e=%+m5zvim94
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [' "systeme-paiement-durand.onrender.com"']
 
 
 
@@ -194,4 +194,4 @@ STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
 
 SITE_URL = "http://localhost:8000"
 
-CSRF_TRUSTED_ORIGINS = ['https://systeme-paiement-durand.onrender.com']
+CSRF_TRUSTED_ORIGINS = ["https://systeme-paiement-durand.onrender.com"]
