@@ -31,7 +31,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 ENV = 'test'
 
-
 # Application definition
 
 
@@ -81,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 ROOT_URLCONF = 'offstore.urls'
@@ -192,3 +192,5 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
 
 SITE_URL = "http://localhost:8000"
+CSRF_TRUSTED_ORIGINS = ["https://systeme-paiement-durand.onrender.com"]
+CSRF_COOKIE_SECURE = True
