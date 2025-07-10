@@ -2,10 +2,7 @@ import stripe
 from django.conf import settings
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-<<<<<<< HEAD
-=======
 from django.utils.decorators import method_decorator
->>>>>>> cc0fb6d4ea581348b81326787a859c11c1a22309
 from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,11 +14,8 @@ from .serializers import PaymentSerializer
 from .enums import PaymentStatus
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-<<<<<<< HEAD
 
-=======
 @method_decorator(csrf_exempt, name='dispatch')
->>>>>>> cc0fb6d4ea581348b81326787a859c11c1a22309
 class CreateStripeCheckoutSession(APIView):
     
     permission_classes = [IsAuthenticated]
