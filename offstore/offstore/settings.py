@@ -26,10 +26,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4r-zsa!v(=2=j5wl0o!l2dvg)5^n=9#9a58w46e=%+m5zvim94'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-ENV = 'test'
+ALLOWED_HOSTS = ["systeme-paiement-durand.onrender.com"]
+
 
 
 # Application definition
@@ -81,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 ROOT_URLCONF = 'offstore.urls'
@@ -107,7 +108,7 @@ WSGI_APPLICATION = 'offstore.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # if ENV=="dev":
-         
+
 #         DATABASES = {
 #             'default': {
 #                 'ENGINE': 'django.db.backends.postgresql',
@@ -192,3 +193,6 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
 
 SITE_URL = "http://localhost:8000"
+
+CSRF_TRUSTED_ORIGINS = ["https://systeme-paiement-durand.onrender.com"]
+CSRF_COOKIE_SECURE = True

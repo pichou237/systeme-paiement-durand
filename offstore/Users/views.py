@@ -3,6 +3,8 @@ from .serializers import (
     UserRegisterSerializer, VerifyEmailSerializer, UserLoginSerializer,
     PasswordResetRequestSerializer, PasswordResetConfirmSerializer, SetNewPasswordSerializer
 )
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -15,7 +17,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+@csrf_exempt
 class UserRegisterView(GenericAPIView):
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
@@ -42,6 +44,7 @@ class UserRegisterView(GenericAPIView):
             "message": f"Utilisateur {user.first_name} créé avec succès. Un code OTP a été envoyé à votre email.",
         }, status=status.HTTP_201_CREATED)
 
+csrf_exempt
 class VerifyEmailView(GenericAPIView):
     serializer_class = VerifyEmailSerializer
     permission_classes = [AllowAny]
@@ -62,7 +65,7 @@ class VerifyEmailView(GenericAPIView):
         except OneTimePasscode.DoesNotExist:
             return Response({"message": "Code OTP invalide."}, status=status.HTTP_404_NOT_FOUND)
 
-
+csrf_exempt
 class LoginUserView(GenericAPIView):
     serializer_class = UserLoginSerializer
     permission_classes = [AllowAny]
@@ -71,20 +74,17 @@ class LoginUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+csrf_exempt
 class UserDetailView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [IsUser, IsManager]
-
-
+csrf_exempt
 class UpdateProfileView(UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [IsUser]
-
-
+csrf_exempt
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
     serializer_class = PasswordResetRequestSerializer
@@ -94,8 +94,7 @@ class PasswordResetRequestView(APIView):
         if serializer.is_valid():
             return Response({"message": "OTP envoyé avec succès."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+csrf_exempt
 class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
     serializer_class = PasswordResetConfirmSerializer
@@ -111,7 +110,7 @@ class PasswordResetConfirmView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+csrf_exempt
 class SetNewPasswordView(APIView):
     permission_classes = [AllowAny]
     serializer_class = SetNewPasswordSerializer
