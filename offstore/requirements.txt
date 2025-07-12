@@ -5,3 +5,4 @@ djangorestframework_simplejwt
 django-cors-headers
 stripe
 python-decouple
+drf_yasg
