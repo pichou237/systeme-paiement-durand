@@ -26,10 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4r-zsa!v(=2=j5wl0o!l2dvg)5^n=9#9a58w46e=%+m5zvim94'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 ENV = 'test'
+DEBUG = False
+
+ALLOWED_HOSTS = ["systeme-paiement-durand.onrender.com"]
+
+
 
 # Application definition
 
@@ -192,5 +197,6 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
 
 SITE_URL = "http://localhost:8000"
+
 CSRF_TRUSTED_ORIGINS = ["https://systeme-paiement-durand.onrender.com"]
 CSRF_COOKIE_SECURE = True
